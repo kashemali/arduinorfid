@@ -1,3 +1,5 @@
+
+
 // Copyright  : Dennis Buis (2017)
 // License    : MIT
 // Platform   : Arduino
@@ -8,16 +10,16 @@
 
 #include "Arduino.h"
 #include "Wiegand.h"
-static volatile int Wiegand::recvBitCount = 0;
-static volatile unsigned long Wiegand::card = 0;
-static volatile byte Wiegand::_available=0;
-static volatile unsigned long Wiegand::_card = 0;
+ volatile int Wiegand::recvBitCount = 0;
+ volatile unsigned long Wiegand::card = 0;
+ volatile byte Wiegand::_available=0;
+ volatile unsigned long Wiegand::_card = 0;
 Wiegand::Wiegand( int D0, int D1)
 {
   // prepare data buffer
 
-  //pinMode(_D0 = D0, INPUT);                        // Set pin used for line D0 as input
-  //pinMode(_D1 = D1, INPUT);                        // Set pin used for line D1 as input
+  pinMode(_D0 = D0, INPUT);                        // Set pin used for line D0 as input
+  pinMode(_D1 = D1, INPUT);                        // Set pin used for line D1 as input
   card = 0;
   recvBitCount = 0;
   isCardReadOver = 0;
@@ -27,8 +29,13 @@ Wiegand::Wiegand( int D0, int D1)
 void Wiegand::begin()
 {
   // disable interupts while attaching
+  if(_D0==2 && _D1==3){
   attachInterrupt(0, _pulseD0, FALLING );  //data0/tx is connected to pin 2, which results in INT 0
   attachInterrupt(1, _pulseD1, FALLING );  //data1/rx is connected to pin 3, which results in INT 1
+  }else{
+    attachInterrupt(digitalPinToInterrupt(_D0), _pulseD0, FALLING );  //data0/tx is connected to pin 2, which results in INT 0
+    attachInterrupt(digitalPinToInterrupt(_D1), _pulseD1, FALLING );  //data1/rx is connected to pin 3, which results in INT 1
+  }
 
 }
 void Wiegand::_pulseD0() {
